@@ -13,11 +13,6 @@ class Blockchain {
     return this.chain[this.chain.length - 1];
   }
 
-  // addBlock(newBlock) {
-  //   newBlock.previousHash = this.getLatestBlock().hash;
-  //   newBlock.mineBlock(this.difficulty);
-  //   this.chain.push(newBlock);
-  // }
   minePendingTransaction(miningRewardAddress) {
     const newBlock = new Block(Date.now(), this.pendingTransaction, this.getLatestBlock().hash);
     newBlock.mineBlock(this.difficulty);
@@ -25,7 +20,9 @@ class Blockchain {
     this.pendingTransaction = [new Transaction(null, miningRewardAddress, this.miningReward)];
   }
 
-  createTransaction(transaction) {
+  addTransaction(transaction) {
+    if (!transaction.from || !transaction.to) throw new Error('Transaction must include "to" and "from" fields');
+    if (!transaction.isValid()) throw new Error("Can't add not valid transaction");
     this.pendingTransaction.push(transaction);
   }
 
@@ -44,7 +41,7 @@ class Blockchain {
     for (let i = 1; i < this.chain.length - 1; i++) {
       const currentBlock = this.chain[i];
       const previousBlock = this.chain[i - 1];
-
+      if (!currentBlock.hasValidTransactions()) return false;
       if (currentBlock.hash !== currentBlock.getHash()) return false;
       if (previousBlock.hash !== currentBlock.previousHash) return false;
     }

@@ -7,7 +7,6 @@ class Block {
     this.previousHash = previousHash;
     this.hash = this.getHash();
     this.nonce = 0;
-    // console.log("BLOCK:" + JSON.stringify(this, null, 2));
   }
 
   getHash() {
@@ -21,7 +20,14 @@ class Block {
       this.nonce++;
       this.hash = this.getHash();
     }
-    console.log("Block mined:" + this.hash);
+    console.log("Block mined: " + this.hash);
+  }
+
+  hasValidTransactions() {
+    for (const tx of this.transactions) {
+      if (!tx.isValid()) return false;
+    }
+    return true;
   }
 }
 
